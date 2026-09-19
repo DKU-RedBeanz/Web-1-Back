@@ -1,13 +1,13 @@
 # 레드빈즈 웹개발 프로젝트 1팀
 
-레드빈즈 웹개발 프로젝트 1팀의 백엔드 저장소입니다. 서비스 주제와 요구사항은 팀 논의 후 작성합니다.
+외부 AI API를 활용한 영단어·회화 학습과, 조건에 맞는 스터디 추천·연결을 제공하는 서비스의 백엔드 저장소입니다. 로그인·회원 정보와 스터디 내부 소통을 기획하며, 댓글 또는 채팅 중 선택은 미정입니다.
 
 ## 프로젝트 정보
 
 | 항목 | 내용 |
 |---|---|
 | 프로젝트명 | 레드빈즈 웹개발 프로젝트 1팀 |
-| 핵심 영역 | 팀 논의 후 확정 |
+| 핵심 영역 | 회원, AI 학습, 스터디 탐색·추천·참여, 내부 소통 |
 | 개발 상태 | 초기 구성 중 |
 | 서비스 버전 | 미릴리스 |
 | 저장소 | [DKU-RedBeanz/Web-1-Back](https://github.com/DKU-RedBeanz/Web-1-Back) |
@@ -52,13 +52,24 @@ Gradle·MySQL의 세부 버전은 초기 프로젝트 구성 시 확정합니다
 - [기타](https://github.com/DKU-RedBeanz/Web-1-Back/wiki/Home#기타): 요구사항·로컬 환경·아키텍처·ERD
 - [회의](https://github.com/DKU-RedBeanz/Web-1-Back/wiki/Meetings): 회의 기록
 
-현재 [Sprint 1](https://github.com/DKU-RedBeanz/Web-1-Back/wiki/Sprint-1)은 공통 프로젝트·개인 로컬 MySQL 연결·Security 초기 설정·사용자 흐름 정리를 다룹니다. 담당자와 기한은 미정입니다.
+현재 [Sprint 1](https://github.com/DKU-RedBeanz/Web-1-Back/wiki/Sprint-1)은 공통 프로젝트·개인 로컬 MySQL 연결·Security 초기 설정·사용자 흐름 정리를 다룹니다. 마감은 **2026-09-24(목)**입니다.
 
 공통 설정은 `.env.example`을 개인 `.env`로 복사해 사용하고 Spring Boot가 직접 읽도록 구현할 예정입니다. 개인 `.env`는 Git에서 제외합니다. 자세한 방법은 [로컬 환경 안내](https://github.com/DKU-RedBeanz/Web-1-Back/wiki/Local-Development)를 참고하세요.
 
+## 역할
+
+| 담당 | 작업 |
+|---|---|
+| 유다현 | Spring 공통 프로젝트·MySQL·.env 설정, 백엔드 연결 지원 |
+| 유관우 | Spring Security 초기 설정, 개인 MySQL 연결 확인 |
+| 박인찬 | [프론트 저장소](https://github.com/DKU-RedBeanz/Web-1-Front)의 기본 프로젝트·스터디 샘플 화면 |
+| 멘토 | 범위 조율, 코드 리뷰·병합 |
+
+DB 연결 완료 기준은 백엔드 두 사람의 `SELECT 1` 성공입니다. AI 제공사·추천 방식·댓글/채팅·인증 방식은 추후 확정합니다. 실제 AI 연동과 CRUD는 Sprint 1 필수 구현 범위가 아닙니다.
+
 ## 실행 방법
 
-Spring 기본 프로젝트 업로드 후 추가 예정입니다. 학생 A의 초기 코드 PR에 MySQL 준비, 빈 DB 생성, 환경변수 등록, 서버 실행, 연결 확인 방법을 함께 작성합니다.
+Spring 기본 프로젝트 업로드 후 추가 예정입니다. 유다현님의 초기 코드 PR에 MySQL 준비, 빈 DB 생성, 환경변수 등록, 서버 실행, 연결 확인 방법을 함께 작성합니다.
 
 ## 협업 방법
 
