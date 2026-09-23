@@ -69,7 +69,43 @@ DB 연결 완료 기준은 백엔드 두 사람의 `SELECT 1` 성공입니다. A
 
 ## 실행 방법
 
-Spring 기본 프로젝트 업로드 후 추가 예정입니다. 유다현님의 초기 코드 PR에 MySQL 준비, 빈 DB 생성, 환경변수 등록, 서버 실행, 연결 확인 방법을 함께 작성합니다.
+1. 이 저장소를 clone합니다.
+
+git clone https://github.com/DKU-RedBeanz/Web-1-Back.git
+
+
+2. `.env.example`을 복사해 `.env` 파일을 만들고, 본인의 로컬 MySQL 계정 정보로 값을 채웁니다.
+
+DB_URL=jdbc:mysql://localhost:3306/redbeanz
+DB_USERNAME=본인_로컬_MySQL_계정
+DB_PASSWORD=본인_로컬_MySQL_비밀번호
+
+`.env`는 절대 커밋하지 않습니다 (`.gitignore`에 등록되어 있음).
+
+3. 로컬 MySQL에 빈 데이터베이스를 생성합니다.
+```sql
+   CREATE DATABASE IF NOT EXISTS redbeanz CHARACTER SET utf8mb4;
+```
+
+4. IDE(IntelliJ 등)에서 프로젝트를 열고, Project SDK와 Gradle JVM을 21로 설정합니다.
+
+5. `RedbeanzBackendApplication`의 main 메서드를 실행합니다. 콘솔에 `Started RedbeanzBackendApplication`이 뜨면 정상 실행된 것입니다.
+
+### DB 연결 검증
+
+애플리케이션 DataSource를 통해 `SELECT 1`을 실행하는 테스트가 포함되어 있습니다.
+
+- 위치: `src/test/java/com/redbeanz/backend/RedbeanzBackendApplicationTests.java`
+- 테스트명: `selectOneReturnsSuccessfully()`
+- 실행: IDE에서 해당 테스트를 실행하거나, 터미널에서 아래 명령 실행
+
+.\gradlew test --tests "com.redbeanz.backend.RedbeanzBackendApplicationTests.selectOneReturnsSuccessfully"
+
+
+### 빌드 확인 명령 (사용한 버전: Gradle 9.7.1, JDK 21)
+
+.\gradlew --version
+.\gradlew classes
 
 ## 협업 방법
 
