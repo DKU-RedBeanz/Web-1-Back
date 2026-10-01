@@ -13,7 +13,7 @@ public class TestController {
 
     @GetMapping("/user")
     public String userEndpoint() {
-        return "user";git add src/main/java/com/redbeanz/backend/SecurityConfig.java src/test/java/com/redbeanz/backend/SecurityConfigTest.java src/test/java/com/redbeanz/backend/TestController.java
+        return "user";
     }
 
     @GetMapping("/admin")
