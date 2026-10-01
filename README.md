@@ -87,6 +87,11 @@ DB_PASSWORD=본인_로컬_MySQL_비밀번호
    CREATE DATABASE IF NOT EXISTS redbeanz CHARACTER SET utf8mb4;
 ```
 
+   `ddl-auto: none`이므로 테이블은 `db/` 폴더의 SQL을 번호 순서대로 직접 실행해 만듭니다.
+```bash
+   mysql -u 본인_계정 -p redbeanz < db/01_create_users.sql
+```
+
 4. IDE(IntelliJ 등)에서 프로젝트를 열고, Project SDK와 Gradle JVM을 21로 설정합니다.
 
 5. `RedbeanzBackendApplication`의 main 메서드를 실행합니다. 콘솔에 `Started RedbeanzBackendApplication`이 뜨면 정상 실행된 것입니다.
