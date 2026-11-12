@@ -13,7 +13,7 @@
 | 저장소 | [DKU-RedBeanz/Web-1-Back](https://github.com/DKU-RedBeanz/Web-1-Back) |
 | 라이선스 | [MIT](LICENSE) |
 
-현재 저장소는 프로젝트 안내와 협업 템플릿을 준비하는 단계입니다. 아래 기술 설정과 의존성은 초기 Spring 프로젝트에 적용할 예정이며, 아직 구현된 기능을 의미하지 않습니다.
+Spring Boot와 MySQL로 회원가입, 아이디 중복 검사, 내 정보 관리 및 관리자용 회원 목록 API를 제공합니다.
 
 ## 기술 및 프로젝트 설정
 
@@ -28,19 +28,17 @@
 | 패키징 | Jar |
 | 설정 형식 | YAML |
 | 로컬·테스트용 DB | **각자의 개인 로컬 MySQL** |
-| 추후 팀 공유 DB | AWS RDS MySQL |
+| 팀 공유 DB | Aiven for MySQL |
 
 Gradle·MySQL의 세부 버전은 초기 프로젝트 구성 시 확정합니다.
 
-### 구성 예정 의존성
+### 주요 의존성
 
 - Spring Web
 - Lombok
 - Validation
 - Spring Data JPA
 - MySQL Driver
-- Spring Boot DevTools
-- SpringDoc OpenAPI
 - Spring Security
 
 의존성 추가와 기능 구현은 구분합니다. 인증·인가 초기 설정의 작업 범위는 스프린트 이슈에서 관리합니다.
@@ -54,7 +52,7 @@ Gradle·MySQL의 세부 버전은 초기 프로젝트 구성 시 확정합니다
 
 현재 [Sprint 1](https://github.com/DKU-RedBeanz/Web-1-Back/wiki/Sprint-1)은 공통 프로젝트·개인 로컬 MySQL 연결·Security 초기 설정·사용자 흐름 정리를 다룹니다. 마감은 **2026-09-24(목)**입니다.
 
-공통 설정은 `.env.example`을 개인 `.env`로 복사해 사용하고 Spring Boot가 직접 읽도록 구현할 예정입니다. 개인 `.env`는 Git에서 제외합니다. 자세한 방법은 [로컬 환경 안내](https://github.com/DKU-RedBeanz/Web-1-Back/wiki/Local-Development)를 참고하세요.
+Spring Boot는 개인 `.env`를 읽습니다. `.env.example`을 복사해 사용하세요. 개인 `.env`는 Git에서 제외합니다.
 
 ## 역할
 
@@ -69,43 +67,34 @@ DB 연결 완료 기준은 백엔드 두 사람의 `SELECT 1` 성공입니다. A
 
 ## 실행 방법
 
-1. 이 저장소를 clone합니다.
+1. 로컬 MySQL에서 데이터베이스를 생성합니다.
 
-git clone https://github.com/DKU-RedBeanz/Web-1-Back.git
-
-
-2. `.env.example`을 복사해 `.env` 파일을 만들고, 본인의 로컬 MySQL 계정 정보로 값을 채웁니다.
-
-DB_URL=jdbc:mysql://localhost:3306/redbeanz
-DB_USERNAME=본인_로컬_MySQL_계정
-DB_PASSWORD=본인_로컬_MySQL_비밀번호
-
-`.env`는 절대 커밋하지 않습니다 (`.gitignore`에 등록되어 있음).
-
-3. 로컬 MySQL에 빈 데이터베이스를 생성합니다.
 ```sql
-   CREATE DATABASE IF NOT EXISTS redbeanz CHARACTER SET utf8mb4;
+CREATE DATABASE IF NOT EXISTS redbeanz CHARACTER SET utf8mb4;
 ```
 
-4. IDE(IntelliJ 등)에서 프로젝트를 열고, Project SDK와 Gradle JVM을 21로 설정합니다.
+2. `mysql -u 본인_계정 -p redbeanz -e "source db/01_create_users.sql"`로 회원 테이블을 생성합니다.
+3. `.env.example`을 `.env`로 복사하고 MySQL 접속 정보를 입력합니다.
+4. JDK 21에서 `.\gradlew.bat bootRun`으로 서버를 실행합니다. 기본 포트는 8080입니다.
 
-5. `RedbeanzBackendApplication`의 main 메서드를 실행합니다. 콘솔에 `Started RedbeanzBackendApplication`이 뜨면 정상 실행된 것입니다.
+로컬 테스트 DB를 사용해 `.\gradlew.bat test`를 실행할 수 있습니다.
 
-### DB 연결 검증
+Aiven에 테이블이 이미 있다면 `.env`의 `DB_URL`에 `jdbc:mysql://<호스트>:<포트>/<DB이름>?sslMode=REQUIRED`를 넣고 `DB_USERNAME`과 `DB_PASSWORD`를 설정합니다. 연결만 확인하려면 `.\gradlew.bat test --tests "*RedbeanzBackendApplicationTests" --rerun`을 실행하세요.
 
-애플리케이션 DataSource를 통해 `SELECT 1`을 실행하는 테스트가 포함되어 있습니다.
+### 회원 API
 
-- 위치: `src/test/java/com/redbeanz/backend/RedbeanzBackendApplicationTests.java`
-- 테스트명: `selectOneReturnsSuccessfully()`
-- 실행: IDE에서 해당 테스트를 실행하거나, 터미널에서 아래 명령 실행
+| 요청 | 권한 | 본문 및 응답 |
+|---|---|---|
+| `POST /api/users` | 공개 | `loginId`, `email`, `password`, `nickname` → 201 회원 정보, 400 입력 오류, 409 아이디·이메일 중복 |
+| `GET /api/users/login-id-availability?loginId=redbeanz` | 공개 | 200 `{ "available": true }` 또는 `{ "available": false }`, 400 잘못된 아이디 |
+| `GET /api/users/me` | 본인 | 200 내 정보와 `X-CSRF-TOKEN` 응답 헤더 |
+| `GET /api/users` | 관리자 | 200 회원 정보 배열, 403 권한 부족 |
+| `PATCH /api/users/me` | 본인 | `email`, `nickname`, `password` 중 변경할 필드 → 200 변경된 회원 정보, 400 입력 오류, 409 이메일 중복 |
+| `DELETE /api/users/me` | 본인 | 회원 정보의 숫자 `id`, 현재 `password` → 204 탈퇴 완료, 403 본인 확인 실패 |
 
-.\gradlew test --tests "com.redbeanz.backend.RedbeanzBackendApplicationTests.selectOneReturnsSuccessfully"
+보호된 API는 가입할 때 사용한 `loginId`와 `password`로 HTTP Basic 인증을 합니다. 운영 환경에서는 HTTPS를 사용합니다. `PATCH`와 `DELETE` 요청에는 먼저 `GET /api/users/me`에서 받은 `JSESSIONID` 쿠키와 `X-CSRF-TOKEN` 헤더를 함께 보냅니다.
 
-
-### 빌드 확인 명령 (사용한 버전: Gradle 9.7.1, JDK 21)
-
-.\gradlew --version
-.\gradlew classes
+`PATCH`로 비밀번호를 바꿀 때는 현재 비밀번호로 인증하고 JSON 본문의 `password`에 새 비밀번호를 보냅니다. 회원 목록과 회원 정보 응답에는 비밀번호와 해시가 포함되지 않습니다.
 
 ## 협업 방법
 
