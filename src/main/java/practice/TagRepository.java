@@ -1,4 +1,7 @@
-package practice;
+package com.redbeanz.backend.practice;
 
-public interface TagRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface TagRepository
+        extends JpaRepository<com.redbeanz.backend.practice.Tag, Long> {
 }
