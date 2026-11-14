@@ -18,7 +18,7 @@ public class Studies {
     private String title;
     @Column(name = "summary", length = 255, nullable = false)
     private String summary;
-    @Column(name = "descriprion")
+    @Column(name = "description")
     private String description;
     @Column(name = "goal", length = 30, nullable = false)
     private String goal;
@@ -38,8 +38,6 @@ public class Studies {
     private Long capacity;
     @Column(name = "leader_nickname", length = 50, nullable = false)
     private String leader_nickname;
-    @Column(name = "created_at", nullable = false)
-    private String created_at;
     @CreationTimestamp // INSERT 시 현재 시간이 자동으로 들어감
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

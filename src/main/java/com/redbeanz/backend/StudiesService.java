@@ -23,7 +23,7 @@ public class StudiesService {
                     studies.getGoal(), studies.getLevel(), studies.getTime(),
                     studies.getMode(), studies.getRegion(), studies.getLocation(),
                     studies.getMember_count(), studies.getCapacity(),
-                    studies.getLeader_nickname(), studies.getCreated_at()
+                    studies.getLeader_nickname(), studies.getCreatedAt().toString()
             );
             return Optional.of(response);
         }
@@ -41,7 +41,7 @@ public class StudiesService {
                     studies.getGoal(), studies.getLevel(), studies.getTime(),
                     studies.getMode(), studies.getRegion(), studies.getLocation(),
                     studies.getMember_count(), studies.getCapacity(),
-                    studies.getLeader_nickname(), studies.getCreated_at()
+                    studies.getLeader_nickname(), studies.getCreatedAt().toString()
             );
             responses.add(response);
         }
