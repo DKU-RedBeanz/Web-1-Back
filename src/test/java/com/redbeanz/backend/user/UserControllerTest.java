@@ -4,29 +4,30 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.redbeanz.backend.core.config.UserSecurityConfig;
 import com.redbeanz.backend.user.controller.UserController;
 import com.redbeanz.backend.user.dto.SignupRequest;
 import com.redbeanz.backend.user.dto.UserResponse;
 import com.redbeanz.backend.user.entity.Role;
 import com.redbeanz.backend.user.exception.DuplicateUserException;
+import com.redbeanz.backend.user.repository.UserRepository;
 import com.redbeanz.backend.user.service.UserService;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-// 컨트롤러의 요청 검증·응답 형식만 확인합니다.
-// 공개 경로 허용은 Security #3의 SecurityConfig에서 설정하므로 여기서는 보안 필터를 끕니다.
 @WebMvcTest(UserController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@Import(UserSecurityConfig.class)
 class UserControllerTest {
 
 	private static final String VALID_BODY = """
@@ -38,6 +39,24 @@ class UserControllerTest {
 
 	@MockitoBean
 	private UserService userService;
+
+	@MockitoBean
+	private UserRepository userRepository;
+
+	@Test
+	void 아이디_중복_검사는_로그인_없이_사용_가능_여부를_반환한다() throws Exception {
+		given(userService.isLoginIdAvailable("unused01")).willReturn(true);
+		given(userService.isLoginIdAvailable("redbeanz")).willReturn(false);
+
+		mockMvc.perform(get("/api/users/login-id-availability").param("loginId", "unused01"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.available").value(true));
+		mockMvc.perform(get("/api/users/login-id-availability").param("loginId", "redbeanz"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.available").value(false));
+		mockMvc.perform(get("/api/users/login-id-availability").param("loginId", "AB"))
+				.andExpect(status().isBadRequest());
+	}
 
 	@Test
 	void 정상_가입은_201과_비밀번호_없는_회원_정보() throws Exception {
