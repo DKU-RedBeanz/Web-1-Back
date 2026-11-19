@@ -27,7 +27,7 @@ Spring Boot와 MySQL로 회원가입, 아이디 중복 검사, 내 정보 관리
 | 기본 패키지 | `com.redbeanz.backend` |
 | 패키징 | Jar |
 | 설정 형식 | YAML |
-| 로컬·테스트용 DB | **각자의 개인 로컬 MySQL** |
+| 개발 실습 DB | **팀 MySQL DB** |
 | 팀 공유 DB | Aiven for MySQL |
 
 Gradle·MySQL의 세부 버전은 초기 프로젝트 구성 시 확정합니다.
@@ -67,21 +67,65 @@ DB 연결 완료 기준은 백엔드 두 사람의 `SELECT 1` 성공입니다. A
 
 ## 실행 방법
 
-1. 로컬 MySQL에서 데이터베이스를 생성합니다.
+1. `.env.example`을 `.env`로 복사합니다.
+2. 팀에서 공유한 MySQL 접속 정보를 `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`에 입력합니다. 기존 팀 테이블을 사용하며 `ddl-auto=none`을 유지합니다.
+3. JDK 21에서 실행합니다. 기본 포트는 8080입니다.
 
-```sql
-CREATE DATABASE IF NOT EXISTS redbeanz CHARACTER SET utf8mb4;
+```bash
+# macOS / Linux
+bash gradlew bootRun
 ```
 
-2. `mysql -u 본인_계정 -p redbeanz -e "source db/01_create_users.sql"`로 회원 테이블을 생성합니다.
-3. `.env.example`을 `.env`로 복사하고 MySQL 접속 정보를 입력합니다.
-4. JDK 21에서 `.\gradlew.bat bootRun`으로 서버를 실행합니다. 기본 포트는 8080입니다.
+```powershell
+# Windows
+.\gradlew.bat bootRun
+```
 
-로컬 테스트 DB를 사용해 `.\gradlew.bat test`를 실행할 수 있습니다.
+### 개발 실습용 Security 설정
 
-Aiven에 테이블이 이미 있다면 `.env`의 `DB_URL`에 `jdbc:mysql://<호스트>:<포트>/<DB이름>?sslMode=REQUIRED`를 넣고 `DB_USERNAME`과 `DB_PASSWORD`를 설정합니다. 연결만 확인하려면 `.\gradlew.bat test --tests "*RedbeanzBackendApplicationTests" --rerun`을 실행하세요.
+스터디·태그 CRUD 실습 중에는 `.env`에 다음 값을 추가하고 서버를 재시작합니다.
 
-### 회원 API
+```properties
+spring.profiles.active=dev
+```
+
+.env는 Java properties 형식으로 읽으므로 위처럼 점으로 구분한 이름을 사용합니다. IDE의 환경변수에는 `SPRING_PROFILES_ACTIVE=dev`를 등록해도 됩니다. `.env` 수정 없이 한 번 실행하려면 다음 명령을 사용합니다.
+
+```bash
+bash gradlew bootRun --args='--spring.profiles.active=dev'
+```
+
+```powershell
+.\gradlew.bat bootRun --args="--spring.profiles.active=dev"
+```
+
+Git의 `dev` 브랜치와 Spring의 `dev` 프로필은 별개입니다. 브랜치를 바꾸는 것만으로 실습 설정이 활성화되지는 않습니다. 시작 로그에서 `dev` 프로필을 확인하세요.
+
+| 요청 | 스터디 | 태그 |
+|---|---|---|
+| 단건 GET | `/api/practice/studies/{id}` | `/api/practice/tags/{id}` |
+| 다건 GET | `/api/practice/studies` | `/api/practice/tags` |
+| POST | `/api/practice/studies` | `/api/practice/tags` |
+| PATCH | `/api/practice/studies/{id}` | `/api/practice/tags/{id}` |
+| DELETE | `/api/practice/studies/{id}` | `/api/practice/tags/{id}` |
+
+- `DevelopmentSecurityConfig`가 위 10개 요청을 포함해 모든 요청을 `permitAll()`로 허용합니다. 개발 기간 동안 관리자용 회원 목록 등 다른 경로도 공개됩니다.
+- HTTP Basic·폼 로그인·로그아웃 필터를 비활성화하여 남아 있는 인증 헤더로 인해 401이 발생하지 않도록 합니다. Postman은 **No Auth**로 사용하면 됩니다.
+- CSRF 검사도 비활성화하므로 POST·PATCH·DELETE에 CSRF 토큰이 필요하지 않습니다.
+- 이 설정은 보안 필터만 변경합니다. 아직 구현되지 않은 API나 잘못된 입력·없는 데이터·DB 오류는 각각의 응답으로 남습니다. API 구현 자체를 추가하지는 않습니다.
+- `/api/users/me`의 조회·수정·탈퇴는 로그인한 사용자(`Principal`)와 일부 요청의 CSRF 토큰을 사용하므로 이 프로필의 익명 실습 대상이 아닙니다. 회원 인증 기능을 확인할 때는 아래 방법으로 기본 설정으로 돌아갑니다.
+
+실습 종료 또는 배포 전에는 `.env`의 `spring.profiles.active=dev`를 제거하고 서버를 재시작합니다. IDE 환경변수·실행 인수에도 `dev`가 남아 있지 않은지 확인하세요. `dev`가 비활성화되면 `UserSecurityConfig`의 기존 인증·관리자 권한·CSRF 설정이 적용됩니다. 배포 환경에는 `dev` 프로필을 활성화하지 않습니다.
+
+DB에 접속하지 않고 보안 설정과 회원 Controller를 확인하는 테스트:
+
+```bash
+bash gradlew test --tests '*DevelopmentSecurityConfigTest' --tests '*DefaultSecurityConfigTest' --tests '*UserControllerTest'
+```
+
+전체 `test`에는 DB를 사용하는 통합 테스트도 포함됩니다. 실행 전 테스트 DB와 대상 데이터를 별도로 확인하세요.
+
+### 회원 API (기본 보안 설정)
 
 | 요청 | 권한 | 본문 및 응답 |
 |---|---|---|

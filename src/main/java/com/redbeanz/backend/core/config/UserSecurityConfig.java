@@ -3,6 +3,7 @@ package com.redbeanz.backend.core.config;
 import com.redbeanz.backend.user.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -34,6 +35,7 @@ public class UserSecurityConfig {
 	}
 
 	@Bean
+	@Profile("!dev")
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		var paths = PathPatternRequestMatcher.withDefaults();
 		var signup = paths.matcher(HttpMethod.POST, "/api/users");
