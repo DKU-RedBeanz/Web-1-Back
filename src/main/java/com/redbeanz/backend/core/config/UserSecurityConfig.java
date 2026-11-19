@@ -18,10 +18,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 public class UserSecurityConfig {
 
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
 
 	@Bean
 	UserDetailsService userDetailsService(UserRepository users) {
@@ -37,12 +33,13 @@ public class UserSecurityConfig {
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		var paths = PathPatternRequestMatcher.withDefaults();
 		var signup = paths.matcher(HttpMethod.POST, "/api/users");
-		var availability = paths.matcher(HttpMethod.GET, "/api/users/login-id-availability");
+		var availability = paths.matcher(HttpMethod.GET, "/api/practice/studies/**");
 
 		return http
 				.csrf(csrf -> csrf.ignoringRequestMatchers(signup))
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers(signup, availability).permitAll()
+						.requestMatchers("/api/**").permitAll()
 						.requestMatchers(paths.matcher(HttpMethod.GET, "/api/users")).hasRole("ADMIN")
 						.anyRequest().authenticated())
 				.httpBasic(withDefaults())
