@@ -16,7 +16,6 @@ public class StudiesResponse {
     private final Long capacity;
     private final String leader_nickname;
     private final String created_at;
-
     public StudiesResponse(
             Long id, String title, String summary, String description,
             String goal, String level, String time, String mode,
