@@ -1,12 +1,22 @@
 package com.redbeanz.backend;
+
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
 @Service
 public class StudiesService {
     private final StudiesRepository studiesRepository;
+
     public StudiesService(StudiesRepository repository) {
         this.studiesRepository = repository;
     }
@@ -47,4 +57,19 @@ public class StudiesService {
         }
         return responses;
     }
+    @Transactional
+    public StudiesResponse update(Long id, StudiesRequest request) {
+        Optional<Studies> result = studiesRepository.findById(id);
+        if (result.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        Studies studies = result.get();
+
+//
+        studies.setTitle(request.getTitle());
+        studies.setDescription(request.getDescription());
+
+        return new StudiesResponse(studies);
+    }
+
 }

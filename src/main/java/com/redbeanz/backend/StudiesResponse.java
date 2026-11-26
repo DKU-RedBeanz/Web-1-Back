@@ -37,4 +37,20 @@ public class StudiesResponse {
         this.leader_nickname = leader_nickname;
         this.created_at = created_at;
     }
+    public StudiesResponse(Studies studies) {
+        this.id = studies.getId();
+        this.title = studies.getTitle();
+        this.summary = studies.getSummary();
+        this.description = studies.getDescription();
+        this.goal = studies.getGoal();
+        this.level = studies.getLevel();
+        this.time = studies.getTime();
+        this.mode = studies.getMode();
+        this.region = studies.getRegion();
+        this.location = studies.getLocation();
+        this.member_count = studies.getMember_count();
+        this.capacity = studies.getCapacity();
+        this.leader_nickname = studies.getLeader_nickname();
+        this.created_at = studies.getCreatedAt().toString();
+    }
 }

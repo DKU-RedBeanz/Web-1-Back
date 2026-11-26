@@ -4,10 +4,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 @Entity
 @Table(name = "Studies")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Studies {
     @Id
