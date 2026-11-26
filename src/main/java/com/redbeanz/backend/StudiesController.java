@@ -1,14 +1,12 @@
 package com.redbeanz.backend;
 
+import java.net.URI;
 import java.util.Optional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.net.URI;
-import java.util.List;
+
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/practice/studies")
@@ -21,12 +19,10 @@ public class StudiesController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StudiesResponse> find(
-            @PathVariable("id") Long id) {
+    public ResponseEntity<StudiesResponse> find(@PathVariable("id") Long id) {
         Optional<StudiesResponse> result = studiesService.find(id);
         if (result.isPresent()) {
-            StudiesResponse response = result.get();
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(result.get());
         }
         return ResponseEntity.notFound().build();
     }
@@ -37,9 +33,30 @@ public class StudiesController {
         return ResponseEntity.ok(responses);
     }
 
-    @PostMapping("/update/{id}")
+    @PostMapping
+    public ResponseEntity<StudiesResponse> create(
+            @Valid @RequestBody StudiesCreateRequest request) {
+        StudiesResponse response = studiesService.create(request);
+        URI location = URI.create("/api/practice/studies/" + response.getId());
+        return ResponseEntity.created(location).body(response);
+    }
+
+    @PatchMapping("/{id}")
     public ResponseEntity<StudiesResponse> update(@PathVariable("id") Long id,
-                                     @Valid @RequestBody StudiesRequest request) {
-        return ResponseEntity.ok(studiesService.update(id, request));
+                                                  @Valid @RequestBody StudiesUpdateRequest request) {
+        Optional<StudiesResponse> result = studiesService.update(id, request);
+        if (result.isPresent()) {
+            return ResponseEntity.ok(result.get());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+        boolean deleted = studiesService.delete(id);
+        if (deleted) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

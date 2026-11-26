@@ -16,7 +16,6 @@ public class StudiesResponse {
     private final Long capacity;
     private final String leader_nickname;
     private final String created_at;
-
     public StudiesResponse(
             Long id, String title, String summary, String description,
             String goal, String level, String time, String mode,
@@ -36,21 +35,5 @@ public class StudiesResponse {
         this.capacity = capacity;
         this.leader_nickname = leader_nickname;
         this.created_at = created_at;
-    }
-    public StudiesResponse(Studies studies) {
-        this.id = studies.getId();
-        this.title = studies.getTitle();
-        this.summary = studies.getSummary();
-        this.description = studies.getDescription();
-        this.goal = studies.getGoal();
-        this.level = studies.getLevel();
-        this.time = studies.getTime();
-        this.mode = studies.getMode();
-        this.region = studies.getRegion();
-        this.location = studies.getLocation();
-        this.member_count = studies.getMember_count();
-        this.capacity = studies.getCapacity();
-        this.leader_nickname = studies.getLeader_nickname();
-        this.created_at = studies.getCreatedAt().toString();
     }
 }

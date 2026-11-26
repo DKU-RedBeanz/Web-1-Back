@@ -2,10 +2,9 @@ package com.redbeanz.backend;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
-
-import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 @Entity
 @Table(name = "Studies")
@@ -41,7 +40,7 @@ public class Studies {
     private Long capacity;
     @Column(name = "leader_nickname", length = 50, nullable = false)
     private String leader_nickname;
-    @CreationTimestamp // INSERT 시 현재 시간이 자동으로 들어감
+    @CreationTimestamp // Set automatically on INSERT
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 }
